@@ -1,0 +1,16 @@
+{
+  "store_open": true,
+  "maintenance": false,
+  "auto_schedule": true,
+  "name": "Pedri Exporta",
+  "tagline": "Movilidad, energía y tecnología para tu futuro",
+  "whatsapp": "",
+  "phone": "",
+  "description": "Motos, triciclos, bicimotos, energía solar y baterías al mejor precio, con entrega confiable.",
+  "about_text": "Pedri Exporta es una comercializadora especializada en movilidad eléctrica y energía solar: motos, triciclos, bicimotos, paneles solares y baterías, con precios competitivos y atención cercana a cada cliente.",
+  "logo_emoji": "⚡",
+  "hours": "Lunes a Sábado · 8:00 AM – 6:00 PM",
+  "footer_note": "© 2026 Pedri Exporta · Todos los derechos reservados.",
+  "color_primary": "#002a8f",
+  "color_accent": "#cf142b"
+}

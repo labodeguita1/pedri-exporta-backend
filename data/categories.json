@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "slug": "motos",
+    "name": "Motos",
+    "sort_order": 1
+  },
+  {
+    "id": 2,
+    "slug": "triciclos",
+    "name": "Triciclos",
+    "sort_order": 2
+  },
+  {
+    "id": 3,
+    "slug": "bicimotos",
+    "name": "Bicimotos",
+    "sort_order": 3
+  },
+  {
+    "id": 4,
+    "slug": "energia_solar",
+    "name": "Energía Solar",
+    "sort_order": 4
+  },
+  {
+    "id": 5,
+    "slug": "baterias",
+    "name": "Baterías",
+    "sort_order": 5
+  },
+  {
+    "id": 6,
+    "slug": "al_por_mayor",
+    "name": "Al por Mayor",
+    "sort_order": 6
+  }
+]
