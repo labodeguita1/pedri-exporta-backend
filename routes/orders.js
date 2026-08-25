@@ -58,4 +58,11 @@ router.patch('/:id/status', requireAuth, (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+/* DELETE /api/orders/:id  [ADMIN] */
+router.delete('/:id', requireAuth, (req, res) => {
+  const ok = db.orders.delete(req.params.id);
+  if (!ok) return res.status(404).json({ error: 'Pedido no encontrado' });
+  res.json({ ok: true });
+});
+
 module.exports = router;

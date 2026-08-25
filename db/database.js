@@ -316,6 +316,15 @@ const orders = {
     return rows[idx];
   },
 
+  delete(id) {
+    const rows = this.all();
+    const idx  = rows.findIndex(o => o.id === +id);
+    if (idx === -1) return false;
+    rows.splice(idx, 1);
+    writeFile('orders', rows);
+    return true;
+  },
+
   stats() {
     const all   = this.all();
     const today = new Date().toISOString().slice(0, 10);

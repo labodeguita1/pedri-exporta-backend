@@ -857,6 +857,7 @@
       <button class="btn btn-sm btn-outline" id="btn-status-pendiente">Pendiente</button>
       <button class="btn btn-sm btn-outline" id="btn-status-confirmado">Confirmado</button>
       <button class="btn btn-sm btn-success btn-sm" id="btn-status-entregado">Entregado ✓</button>
+      <button class="btn btn-sm btn-danger" style="margin-left:auto" onclick="deleteOrder(currentOrderId); closeModal('modal-order')">🗑 Eliminar pedido</button>
     </div>
   </div>
 </div>
@@ -1441,9 +1442,22 @@ function renderOrders() {
       <td><strong>${fmt(o.total)}</strong></td>
       <td><span class="badge badge-${o.status}">${o.status}</span></td>
       <td style="font-size:.8rem;color:var(--muted)">${fmtDate(o.created_at)}</td>
-      <td><button class="btn btn-sm btn-outline" onclick="openOrder(${o.id})">Ver detalle</button></td>
+      <td>
+        <button class="btn btn-sm btn-outline" onclick="openOrder(${o.id})">Ver detalle</button>
+        <button class="btn btn-sm btn-danger" style="margin-left:4px" onclick="deleteOrder(${o.id})">🗑</button>
+      </td>
     </tr>
   `).join('');
+}
+
+async function deleteOrder(id) {
+  if (!confirm(`¿Eliminar el pedido #${id}? Esta acción no se puede deshacer.`)) return;
+  try {
+    await api(`/orders/${id}`, { method: 'DELETE' });
+    allOrders = allOrders.filter(o => o.id !== id);
+    renderOrders();
+    toast('Pedido eliminado', 'success');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 document.getElementById('order-status-filter').addEventListener('change', loadOrders);
