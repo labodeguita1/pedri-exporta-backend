@@ -17,6 +17,8 @@ const CATEGORIES = [
   { id: 4, slug: 'energia_solar',  name: 'Energía Solar',  sort_order: 4 },
   { id: 5, slug: 'baterias',       name: 'Baterías',       sort_order: 5 },
   { id: 6, slug: 'al_por_mayor',   name: 'Al por Mayor',   sort_order: 6 },
+  { id: 7, slug: 'autos_camiones', name: 'Autos y Camiones', sort_order: 7 },
+  { id: 8, slug: 'otros',          name: 'Otros',          sort_order: 8 },
 ];
 
 /* ── Productos ── */
