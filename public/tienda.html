@@ -1708,10 +1708,11 @@ async function loadProductsFromAPI() {
 
     categories.forEach(cat => {
       const catProds = products.filter(p => p.category_id === cat.id);
-      if (!catProds.length) return;
 
       const icon    = CAT_ICONS[cat.slug] || '📦';
-      const cards   = catProds.map(buildProductCard).join('');
+      const cards   = catProds.length
+        ? catProds.map(buildProductCard).join('')
+        : `<p style="grid-column:1/-1;color:var(--muted);padding:1rem 0">Próximamente productos en esta categoría.</p>`;
       const section = document.createElement('div');
       section.className = 'section';
       section.id        = cat.slug;
