@@ -1,6 +1,47 @@
 const router      = require('express').Router();
 const db          = require('../db/database');
 const requireAuth = require('../middleware/auth');
+const { getTransporter, mailConfigured } = require('../utils/mailer');
+
+/* Avisar al admin por correo, sin depender de que el cliente mande el WhatsApp */
+async function notifyNewOrder(order) {
+  if (!mailConfigured() || !process.env.ADMIN_NOTIFICATION_EMAIL) return;
+  try {
+    const storeName = (db.settings.get().name) || 'Pedri Exporta';
+    const itemsHtml = order.items.map(i =>
+      `<tr>
+        <td style="padding:6px 10px">${i.product_name}${i.variant_label ? ' (' + i.variant_label + ')' : ''}</td>
+        <td style="padding:6px 10px;text-align:center">${i.quantity}</td>
+        <td style="padding:6px 10px;text-align:right">$${i.subtotal.toFixed(2)}</td>
+      </tr>`
+    ).join('');
+
+    await getTransporter().sendMail({
+      from:    `"${storeName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      to:      process.env.ADMIN_NOTIFICATION_EMAIL,
+      subject: `🛒 Nuevo pedido #${order.id} — ${storeName}`,
+      html: `
+        <div style="font-family:sans-serif;max-width:520px;margin:auto;padding:24px">
+          <h2 style="color:#cf142b">🛒 Nuevo pedido #${order.id}</h2>
+          <p><strong>Cliente:</strong> ${order.customer_name}<br>
+             <strong>Teléfono:</strong> ${order.customer_phone || '—'}<br>
+             <strong>Recibe:</strong> ${order.receptor_name || '—'} (${order.receptor_phone || '—'})<br>
+             <strong>Dirección:</strong> ${order.customer_address || '—'}<br>
+             <strong>Zona:</strong> ${order.zona || '—'}</p>
+          <table style="width:100%;border-collapse:collapse;margin:16px 0">
+            <thead><tr style="border-bottom:2px solid #eee;text-align:left">
+              <th style="padding:6px 10px">Producto</th><th>Cant.</th><th style="text-align:right">Subtotal</th>
+            </tr></thead>
+            <tbody>${itemsHtml}</tbody>
+          </table>
+          <p style="font-size:1.1rem"><strong>Total: $${order.total.toFixed(2)}</strong></p>
+          ${order.notes ? `<p><strong>Notas:</strong> ${order.notes}</p>` : ''}
+        </div>`
+    });
+  } catch (e) {
+    console.warn('No se pudo enviar el aviso de pedido por correo:', e.message);
+  }
+}
 
 /* POST /api/orders  [PUBLIC] */
 router.post('/', (req, res, next) => {
@@ -10,6 +51,7 @@ router.post('/', (req, res, next) => {
       return res.status(400).json({ error: 'customer_name e items son requeridos' });
 
     const order = db.orders.create(req.body);
+    notifyNewOrder(order);
     res.status(201).json(order);
   } catch (err) {
     err.status = 400;

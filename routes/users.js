@@ -1,20 +1,11 @@
 const router          = require('express').Router();
 const bcrypt          = require('bcryptjs');
 const jwt             = require('jsonwebtoken');
-const nodemailer      = require('nodemailer');
 const { body, validationResult } = require('express-validator');
 const db              = require('../db/database');
 const requireAuth     = require('../middleware/auth');
 const requireUserAuth = require('../middleware/userAuth');
-
-function getTransporter() {
-  return nodemailer.createTransport({
-    host:   process.env.SMTP_HOST,
-    port:   parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_PORT === '465',
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-  });
-}
+const { getTransporter } = require('../utils/mailer');
 
 /* ── helpers ── */
 function signUserToken(user) {
