@@ -5,7 +5,14 @@ const { getTransporter, mailConfigured } = require('../utils/mailer');
 
 /* Avisar al admin por correo, sin depender de que el cliente mande el WhatsApp */
 async function notifyNewOrder(order) {
-  if (!mailConfigured() || !process.env.ADMIN_NOTIFICATION_EMAIL) return;
+  console.log('[notifyNewOrder] pedido', order.id,
+    'SMTP_HOST=' + JSON.stringify(process.env.SMTP_HOST),
+    'SMTP_USER=' + JSON.stringify(process.env.SMTP_USER),
+    'ADMIN_NOTIFICATION_EMAIL=' + JSON.stringify(process.env.ADMIN_NOTIFICATION_EMAIL));
+  if (!mailConfigured() || !process.env.ADMIN_NOTIFICATION_EMAIL) {
+    console.log('[notifyNewOrder] omitido: correo no configurado');
+    return;
+  }
   try {
     const storeName = (db.settings.get().name) || 'Pedri Exporta';
     const itemsHtml = order.items.map(i =>
@@ -38,8 +45,9 @@ async function notifyNewOrder(order) {
           ${order.notes ? `<p><strong>Notas:</strong> ${order.notes}</p>` : ''}
         </div>`
     });
+    console.log('[notifyNewOrder] correo enviado ok para pedido', order.id);
   } catch (e) {
-    console.warn('No se pudo enviar el aviso de pedido por correo:', e.message);
+    console.warn('[notifyNewOrder] ERROR enviando correo para pedido', order.id, ':', e.message);
   }
 }
 
