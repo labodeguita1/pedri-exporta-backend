@@ -1,18 +1,11 @@
 const router      = require('express').Router();
 const db          = require('../db/database');
 const requireAuth = require('../middleware/auth');
-const { getTransporter, mailConfigured } = require('../utils/mailer');
+const { sendMail, mailConfigured } = require('../utils/mailer');
 
 /* Avisar al admin por correo, sin depender de que el cliente mande el WhatsApp */
 async function notifyNewOrder(order) {
-  console.log('[notifyNewOrder] pedido', order.id,
-    'SMTP_HOST=' + JSON.stringify(process.env.SMTP_HOST),
-    'SMTP_USER=' + JSON.stringify(process.env.SMTP_USER),
-    'ADMIN_NOTIFICATION_EMAIL=' + JSON.stringify(process.env.ADMIN_NOTIFICATION_EMAIL));
-  if (!mailConfigured() || !process.env.ADMIN_NOTIFICATION_EMAIL) {
-    console.log('[notifyNewOrder] omitido: correo no configurado');
-    return;
-  }
+  if (!mailConfigured() || !process.env.ADMIN_NOTIFICATION_EMAIL) return;
   try {
     const storeName = (db.settings.get().name) || 'Pedri Exporta';
     const itemsHtml = order.items.map(i =>
@@ -23,8 +16,8 @@ async function notifyNewOrder(order) {
       </tr>`
     ).join('');
 
-    await getTransporter().sendMail({
-      from:    `"${storeName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+    await sendMail({
+      from:    `${storeName} <${process.env.SMTP_FROM}>`,
       to:      process.env.ADMIN_NOTIFICATION_EMAIL,
       subject: `🛒 Nuevo pedido #${order.id} — ${storeName}`,
       html: `

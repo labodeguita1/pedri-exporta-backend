@@ -5,7 +5,7 @@ const { body, validationResult } = require('express-validator');
 const db              = require('../db/database');
 const requireAuth     = require('../middleware/auth');
 const requireUserAuth = require('../middleware/userAuth');
-const { getTransporter } = require('../utils/mailer');
+const { sendMail, mailConfigured } = require('../utils/mailer');
 
 /* ── helpers ── */
 function signUserToken(user) {
@@ -176,7 +176,7 @@ router.post('/forgot-password', async (req, res, next) => {
     const user = db.users.findByCorreo(correo);
     if (!user) return res.json({ ok: true });
 
-    if (!process.env.SMTP_HOST || !process.env.SMTP_USER)
+    if (!mailConfigured())
       return res.status(503).json({ error: 'El servicio de correo no está configurado. Contacta al administrador.' });
 
     const token       = db.resetTokens.create(user.id);
@@ -184,8 +184,8 @@ router.post('/forgot-password', async (req, res, next) => {
     const resetLink   = `${frontendUrl}/reset-password.html?token=${token}`;
     const storeName   = (db.settings.get().name) || 'Pedri Exporta';
 
-    await getTransporter().sendMail({
-      from:    `"${storeName}" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+    await sendMail({
+      from:    `${storeName} <${process.env.SMTP_FROM}>`,
       to:      user.correo,
       subject: `Recuperar contraseña — ${storeName}`,
       html: `
